@@ -25,9 +25,11 @@ public class SetPoint : MonoBehaviour
             lr.SetPosition(index, points[index].transform.position); // run the array and position points on stablished positions
     }
 
+    /// <summary>
+    /// When press the button this function eliminates all gameobjects of type sphere for this case and clear the workspace
+    /// </summary>
     public void CleanSpheres()
     {
-        //points.Clear();
         for (int i = 0; i < points.Count; i++)
             GameObject.Destroy(points[i]);
         for (int i = 0; i < points.Count; i++)

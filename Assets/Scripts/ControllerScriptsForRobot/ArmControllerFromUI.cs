@@ -19,17 +19,18 @@ public class ArmControllerFromUI : MonoBehaviour
     void Start()
     {
         DefineInitialValues();
-        //define initial values
         foreach (var slides in articularSliders)
         {
             slides.onValueChanged.AddListener((float value) =>
             {
-                ProcessMovement();
+                ProcessMovement(); //Call the function when change the value on the slider
             });        
         }
         
     }
-
+    /// <summary>
+    /// when starts the application set value for each slider on scene
+    /// </summary>
     void DefineInitialValues()
     {
         for (int i = 0; i < articularSliders.Length; i++)
@@ -51,7 +52,9 @@ public class ArmControllerFromUI : MonoBehaviour
             }
         }
     }
-
+    /// <summary>
+    /// Execute the movement and it depends from the slider value
+    /// </summary>
     void ProcessMovement()
     {
         for (int i = 0; i < robotArticulations.Length; i++)
