@@ -6,10 +6,10 @@ using System;
 public class UR3Solver
 {
     //change your DH parameters to match the scaling in unity
-    private float DH_ratio = 4.185057f / 0.425f; //taken from length of DH_a
+    private float DH_ratio = 4.185057f / 0.18445f; //taken from length of DH_a
     //DH_d[4] was changed to -.119 from .109 to accomidate axis change (and .119 fit better for unity), and DH_d[5] was changed slightly as well    
-    private float[] DH_d = { 0f, .0475f, 0f, 0f, -.073f, .06202f, .0335f }; //Change values DH_d y DH_a to construct a new system and converts the measures from mm to meters
-    private float[] DH_a = { 0f, 0f, -.21787f, -.20188f, 0f, 0f, 0f };
+    private float[] DH_d = { 0f, .0475f, 0f, 0f, -.04784f, .05375f, .02228f }; //Change values DH_d y DH_a to construct a new system 
+    private float[] DH_a = { 0f, 0f, -.18445f, -.17217f, 0f, 0f, 0f }; //Use meters for the measures
     private float[] DH_alph = { 0f, (float)(Math.PI / 2), 0f, 0f, (float)(Math.PI / 2), (float)(-Math.PI / 2), 0f };
 
     //contains final solutions for Unity
