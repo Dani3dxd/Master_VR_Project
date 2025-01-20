@@ -13,7 +13,7 @@ public class ArduinoController : MonoBehaviour
     [Header("Puerto Serial COM")]
     [SerializeField] private List<String> connectionPorts;
     [SerializeField] private int baudRate = 115200;
-    [SerializeField] bool isConnected = false;
+    [SerializeField] public bool isConnected = false;
 
     [Header("Buttons")]
     [SerializeField] TMP_Dropdown dropList;
@@ -21,26 +21,40 @@ public class ArduinoController : MonoBehaviour
     [SerializeField] Button disconnectBtn;
 
     [Header("Nivel")]
-    [SerializeField][Range(0, 255)] private int brightness1 = 0;
-    [SerializeField][Range(0, 255)] private int brightness2 = 0;
-    
+    [SerializeField] [Range(0, 180)] private int [] motor = new int[6];
+    /*[SerializeField][Range(0, 180)] private int motor1 = 0;
+    [SerializeField][Range(0, 180)] private int motor2 = 0;
+    [SerializeField][Range(0, 180)] private int motor3 = 0;
+    [SerializeField][Range(90, 180)] private int motor4 = 180;
+    [SerializeField][Range(0, 180)] private int motor5 = 90;
+    [SerializeField][Range(0, 360)] private int motor6 = 0;*/
+
+    //[SerializeField] bool sendInf = false;
+
+
 
     void Start()
     {
         RefreshPorts();
+        ActivateConnectionButtons();
     }
 
-    void Update()
+    public void SendData(string angleMotorData)
     {
-
+        //first write the serial port later read
         if (isConnected)
         {
             try
             {
-                // Enviar valores de brillo al Arduino
-                string brightnessData = brightness1.ToString() + "," + brightness2.ToString();
-                arduinoPort.WriteLine(brightnessData);
-                Debug.Log("Enviando brillo: " + brightnessData);
+                //if(sendInf)
+                //{
+                // Send value data of each angle on UR robot
+                //string angleMotorData = string.Join("*", motor) + "\n";      
+                arduinoPort.WriteLine(angleMotorData);
+                Debug.Log($"Enviando ángulo: {angleMotorData}");
+          
+                //}
+                //sendInf = false;
 
             }
             catch (Exception e)
@@ -48,8 +62,19 @@ public class ArduinoController : MonoBehaviour
                 Debug.LogError("Error al enviar datos al Arduino: " + e.Message);
             }
         }
-        connectBtn.gameObject.SetActive(!isConnected);
-        disconnectBtn.gameObject.SetActive(isConnected);
+        if (arduinoPort != null && arduinoPort.IsOpen)
+        {
+            try
+            {
+                string dataReceived = arduinoPort.ReadLine(); //Read a line from serial port after send data
+                Debug.Log($"Dato recibido: {dataReceived}");
+            }
+            catch (TimeoutException)
+            {
+                // Ignorar el timeout si no hay datos disponibles
+            }
+        }
+        
     }
 
     public void RefreshPorts()
@@ -70,6 +95,7 @@ public class ArduinoController : MonoBehaviour
         {
             arduinoPort.Open();
             arduinoPort.WriteTimeout = 500;
+            arduinoPort.ReadTimeout = 10;
 
             Debug.Log("Puerto serial abierto correctamente.");
             isConnected = true;
@@ -78,12 +104,22 @@ public class ArduinoController : MonoBehaviour
         {
             Debug.LogError("No se pudo abrir el puerto serial: " + e.Message);
         }
+        ActivateConnectionButtons();
     }
 
     public void Disconnect()
     {
+        //arduinoPort.WriteLine("0,0,0,180,90,0");
         isConnected = false;
+        ActivateConnectionButtons();
         arduinoPort.Close();
+        Debug.Log("Puerto serial cerrado correctamente.");
+    }
+
+    private void ActivateConnectionButtons()
+    {
+        connectBtn.gameObject.SetActive(!isConnected);
+        disconnectBtn.gameObject.SetActive(isConnected);
     }
 
     void OnApplicationQuit()
