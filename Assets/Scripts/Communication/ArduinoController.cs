@@ -19,24 +19,18 @@ public class ArduinoController : MonoBehaviour
     [SerializeField] TMP_Dropdown dropList;
     [SerializeField] Button connectBtn;
     [SerializeField] Button disconnectBtn;
+    [SerializeField] Button enableBtn;
+    [SerializeField] Button disableBtn;
 
-    [Header("Nivel")]
+    [Header("Motores")]
+    [SerializeField] public bool enableMotors = false;
     [SerializeField] [Range(0, 180)] private int [] motor = new int[6];
-    /*[SerializeField][Range(0, 180)] private int motor1 = 0;
-    [SerializeField][Range(0, 180)] private int motor2 = 0;
-    [SerializeField][Range(0, 180)] private int motor3 = 0;
-    [SerializeField][Range(90, 180)] private int motor4 = 180;
-    [SerializeField][Range(0, 180)] private int motor5 = 90;
-    [SerializeField][Range(0, 360)] private int motor6 = 0;*/
-
-    //[SerializeField] bool sendInf = false;
-
-
-
+    
     void Start()
     {
         RefreshPorts();
         ActivateConnectionButtons();
+        EnableMotors();
     }
 
     public void SendData(string angleMotorData)
@@ -46,10 +40,10 @@ public class ArduinoController : MonoBehaviour
         {
             try
             {
-                //if(sendInf)
+                if(enableBtn)
                 //{
                 // Send value data of each angle on UR robot
-                //string angleMotorData = string.Join("*", motor) + "\n";      
+                
                 arduinoPort.WriteLine(angleMotorData);
                 Debug.Log($"Enviando ángulo: {angleMotorData}");
           
@@ -109,7 +103,6 @@ public class ArduinoController : MonoBehaviour
 
     public void Disconnect()
     {
-        //arduinoPort.WriteLine("0,0,0,180,90,0");
         isConnected = false;
         ActivateConnectionButtons();
         arduinoPort.Close();
@@ -120,6 +113,13 @@ public class ArduinoController : MonoBehaviour
     {
         connectBtn.gameObject.SetActive(!isConnected);
         disconnectBtn.gameObject.SetActive(isConnected);
+    }
+
+    public void EnableMotors()
+    {
+        enableMotors = !enableMotors;
+        enableBtn.gameObject.SetActive(!enableMotors);
+        disableBtn.gameObject.SetActive(enableMotors);
     }
 
     void OnApplicationQuit()

@@ -27,6 +27,11 @@ public class ArtControllerFromUI : ControllerBase
                     sliders[i].maxValue = 0;
                 break;
                 
+                case 2:
+                    sliders[i].minValue = -160;
+                    sliders[i].maxValue = 160;
+                break;
+                
                 default:
                     sliders[i].minValue = -90;
                     sliders[i].maxValue = 90;

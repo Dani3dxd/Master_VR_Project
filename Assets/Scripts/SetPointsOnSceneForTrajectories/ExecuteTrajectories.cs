@@ -47,20 +47,25 @@ public class ExecuteTrajectories : MonoBehaviour
                     motorAngles[j] = Mathf.RoundToInt(trajectories[trajectoriesCount][j].y);
                     break;
                 case 2:
-                    motorAngles[j] = Mathf.RoundToInt(MapDegrees(trajectories[trajectoriesCount][j].x, j));
-
+                    motorAngles[j] = Mathf.RoundToInt(MapAngle(trajectories[trajectoriesCount][j].x, trajectories[trajectoriesCount][j].y, j));                   
                     break;
                 case 4:
-                    motorAngles[j] = Mathf.RoundToInt(MapDegrees(trajectories[trajectoriesCount][j].y, j));
+                    motorAngles[j] = Mathf.RoundToInt(MapAngle(trajectories[trajectoriesCount][j].y, trajectories[trajectoriesCount][j].y, j));
 
                     break;
                 default: //1 or 3
                     motorAngles[j] = Mathf.RoundToInt(MapAngle(trajectories[trajectoriesCount][j].x, trajectories[trajectoriesCount][j].y, j));
                     break;
             }
-        
-        if(trajectoriesCount!=0)    //if trajectory is not the first one save in other case ignore
-            dataListArduino.Add(string.Join("*", motorAngles) + "\n"); //save and prepare information like a String to send later to arduino
+
+        if (trajectoriesCount != 0)    //if trajectory is not the first one save in other case ignore
+        {
+            if (arduinoController.enableMotors) //if the button that enables the value of the 3 last motors
+                dataListArduino.Add(string.Join("*", motorAngles) + "\n"); //save and prepare information like a String to send later to arduino
+            else
+                dataListArduino.Add("*"+motorAngles[0]+"*"+motorAngles[1]+"*"+motorAngles[2]+"*181*181*0\n"); // in other case send a error value to disable the last 3 motors
+        }
+
         
         trajectoriesCount++;
     }
@@ -131,50 +136,58 @@ public class ExecuteTrajectories : MonoBehaviour
     {
         float newAngle = 0f;
 
-        if (iteration == 1)
+        switch (iteration)
         {
-            if (yAngle == 0f)
-                newAngle = (xAngle == 0f) ? 0f : (xAngle - 360f) * -1f;
+            case 1:
+                if (yAngle == 0f)
+                    newAngle = (xAngle == 0f) ? 0f : (xAngle - 360f) * -1f;
 
-            else if (yAngle == 180f)
-                newAngle = (xAngle < 1f) ? 180f : xAngle - 180f;
+                else if (yAngle == 180f)
+                    newAngle = (xAngle < 1f) ? 180f : xAngle - 180f;
+                break;
+
+            case 2:
+                if (yAngle == 0f)
+                {
+
+                    if (xAngle >= 270 && xAngle < 360)
+                        newAngle = Mathf.Lerp(90, 180, Mathf.InverseLerp(270, 360, xAngle));
+
+                    else if (xAngle >= 0 && xAngle <= 90)
+                        newAngle = Mathf.Lerp(180, 270, Mathf.InverseLerp(0, 90, xAngle));
+                }
+                else if (yAngle == 180f)
+                {
+
+                    if (xAngle >= 270 && xAngle < 360)
+                        newAngle = Mathf.Lerp(90, 0, Mathf.InverseLerp(270, 360, xAngle));
+
+                    else if (xAngle >= 0 && xAngle <= 90)
+                        newAngle = Mathf.Lerp(360, 270, Mathf.InverseLerp(0, 90, xAngle));
+                }
+                break;
+
+            case 3:
+                if (yAngle == 180f)
+                    newAngle = (xAngle < 1f) ? 0f : (xAngle - 360f) * -1f;
+
+                else if (yAngle == 0f)
+                    newAngle = (xAngle < 1f) ? 180f : xAngle - 180f;
+                break;
+
+            case 4:
+                if (xAngle >= 270 && xAngle < 360)
+                    newAngle = Mathf.Lerp(180, 90, Mathf.InverseLerp(270, 360, xAngle));
+
+                else if (xAngle >= 0 && xAngle <= 90)
+                    newAngle = Mathf.Lerp(90, 0, Mathf.InverseLerp(0, 90, xAngle));
+                break;
+
+            default:
+                Debug.LogWarning("Iteration value is not valid.");
+                break;
         }
 
-        if (iteration == 3)
-        {
-            if (yAngle == 180f)
-                newAngle = (xAngle < 1f) ? 0f : (xAngle - 360f) * -1f;
-
-            else if (yAngle == 0f)
-                newAngle = (xAngle < 1f) ? 180f : xAngle - 180f;
-        }
-
-        return newAngle;
-    }
-
-    float MapDegrees(float xAngle, int iteration)
-    {
-        float newAngle = 0f;
-
-        if (iteration == 2)
-        {
-            if (xAngle >= 270 && xAngle < 360)
-                newAngle = Mathf.Lerp(0, 90, Mathf.InverseLerp(270, 360, xAngle));
-
-            else if (xAngle >= 0 && xAngle <= 90)
-                newAngle = Mathf.Lerp(90, 180, Mathf.InverseLerp(0, 90, xAngle));
-        }
-
-        if (iteration == 4)
-        {
-            if (xAngle >= 270 && xAngle < 360)
-                newAngle = Mathf.Lerp(180, 90, Mathf.InverseLerp(270, 360, xAngle));
-
-            else if (xAngle >= 0 && xAngle <= 90)
-                newAngle = Mathf.Lerp(90, 0, Mathf.InverseLerp(0, 90, xAngle));
-        }
-        
-        
         return newAngle;
     }
 }
