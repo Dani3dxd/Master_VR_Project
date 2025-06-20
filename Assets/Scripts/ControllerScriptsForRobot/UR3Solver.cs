@@ -284,6 +284,6 @@ public class UR3Solver
                 this.solutionMatrix[1, i] = theta2;
                 this.solutionMatrix[3, i] = theta4;
             }
-        }
+        }  
     }
 }
